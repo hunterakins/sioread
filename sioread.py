@@ -4,29 +4,30 @@ from math import ceil,floor
 
 def sioread(**kwargs):
     '''
-    Translation of Jit Sarkar's sioread.m to Python
+    Translation of Jit Sarkar's sioread.m to Python (which was a modification of Aaron Thode's with contributions from Geoff Edelman, James Murray, and Dave Ensberg).
     Hunter Akins
     June 4, 2019
 
-     Input parameters:
-    	file_name	:[str]			Name/path to .sio data file to read
-    	s_start		:[int](1)		Sample # to begin reading from (default 1)
-    	Ns			:[int](1)		Total # of samples to read (default all)
-    	Channel		:[int](Nc)		Which channels to read (default all)
-    								Channel 0 returns header only, X is empty
-    	inMem		:[lgcl](1)		Perform data parsing in ram (default true)
+     Input keys:
+    	fname	(str)               Name/path to .sio data file to read
+    	s_start		(int)    		Sample # to begin reading from (default 1). Must be an integer multiple of the record number. To get the record number you can run the script with s_start = 1 and then check the header for the info
+    	Ns			(int)		    Total # of samples to read (default all)
+    	channels	list of ints	Which channels to read (default all) (INDEXES AT 0)
+    								Channel -1 returns header only, X is empty
+    	inMem		bool            Perform data parsing in ram (default true)
     								False - Disk intensive, memory efficient
     									Blocks read sequentially, keeping only
-    									requested channels
+    									requested channels. Not yet implemented
     								True  - Disk efficient, memory intensive
     									All blocks read at once, requested
     									channels are selected afterwards
     
      Output parameters:
-    	X			:[dbl](Ns,Nc)	Data output matrix
-    	Header		:[struct]		Descriptors found in file header
+    	X			array(Ns,Nc)	Data output matrix
+    	Header	    dictionary		Descriptors found in file header
 
     '''
+
     if 'fname' not in kwargs.keys():
         raise ValueError("must pass me a filename")
     file_name = kwargs['fname']
@@ -113,7 +114,7 @@ def sioread(**kwargs):
             
 
         # if either channel or # of samples is 0, then return just header
-        if (0 in channels) or (Ns == 0):
+        if  (channels[0] == -1) or (Ns == 0):
             X	=	[]
             return X, Header
 
@@ -179,7 +180,7 @@ def sioread(**kwargs):
             if	m > Ns:
                 X = X[:int(Ns), :]
             if	m < Ns:
-                raise ValueError('Requested # of samples not returned')
+                raise ValueError('Requested # of samples not returned. Check that s_start is multiple of rec_num')
             
             
         # Incremental loading
