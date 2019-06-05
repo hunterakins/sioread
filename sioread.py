@@ -114,7 +114,11 @@ def sioread(**kwargs):
             
 
         # if either channel or # of samples is 0, then return just header
-        if  (channels[0] == -1) or (Ns == 0):
+        if  (Ns == 0):
+            X	=	[]
+            return X, Header
+
+        if (len(channels) == 1) and (channels[0] == -1):
             X	=	[]
             return X, Header
 
@@ -145,8 +149,6 @@ def sioread(**kwargs):
         # Aggregate loading
         if	inMem:
             # Move to starting location
-            print(r_start)
-            print(BpR)
             f.seek( r_start*BpR)
 
             # Read in all records into single column
