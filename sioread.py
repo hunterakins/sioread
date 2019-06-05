@@ -100,16 +100,16 @@ def sioread(**kwargs):
         Header['comment'] = comment
         Header['bs']  = bs
         Header['Description'] = """
-                    ID		=	ID Number
-                    Nr		=	# of Records in File
-                    BpR	=	# of Bytes per Record
-                    Nc		=	# of channels in File
-                    BpS	=	# of Bytes per Sample
-                    tfReal	=	0 - integer, 1 - real
-                    SpC	=	# of Samples per Channel
-                    fname	=	File name
-                    comment=	Comment String
-                    bs		=	Endian check value, should be 32677
+                    ID= ID Number 
+                    Nr  = # of Records in File 
+                    BpR = # of Bytes per Record 
+                    Nc  = # of channels in File
+                    BpS = # of Bytes per Sample
+                    tfReal = 0 - integer, 1 - real
+                    SpC = # of Samples per Channel
+                    fname = File name 
+                    comment= Comment String 
+                    bs  = Endian check value, should be 32677
                     """
             
 
