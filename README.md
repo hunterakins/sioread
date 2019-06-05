@@ -1,0 +1,2 @@
+# sioread
+Read .sio files
