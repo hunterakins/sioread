@@ -1,4 +1,4 @@
-from sioread.sioread import sioread
+from sioread.sioread import sioread, SioStream
 import numpy as np
 from math import ceil
 from scipy.io import loadmat
@@ -34,3 +34,11 @@ for key in hdr.keys():
 # i'm confused
 help(sioread) # show the docstring
 
+
+
+##SioStream example
+stream = SioStream(fname) # initialize SioStream object
+data_slice = stream[0:2000] # returns the first 2000 samples of the sio file as a numpy array with the first axis corresponding the the different channels and the second axis corresponding to time 
+# plot first channel time series
+plt.plot(data_slice[0,:])
+plt.show()
