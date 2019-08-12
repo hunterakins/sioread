@@ -38,14 +38,12 @@ def sioread(**kwargs):
         if 's_start' in kwargs.keys():
             tmp = kwargs['s_start']
             s_start = max(tmp, 0)
-       
 
         if 'Ns' not in kwargs.keys():
             Ns = -1
         else:
             Ns = kwargs['Ns']
             
-
         if 'channels' not in kwargs.keys():
             channels = []
         else:
@@ -190,3 +188,39 @@ def sioread(**kwargs):
             print('Not yet implemented incremental loading')
 
     return X, Header
+
+
+class SioStream:
+    """
+    data object implementing indexing and return sequential data 
+    Indexing starts out 0, but sioread indexes at 1, so I need to add 1 to all keys
+    """
+    def __init__(self, fname):
+        s_start, Ns = 1, 1
+        inp = {'fname': fname, 's_start': s_start, 'Ns':Ns}
+        [tmp, hdr] = sioread(**inp)
+        # use header to get Nc and samples per channel
+        self.Nc = hdr['Nc'] 
+        self.SpC = hdr['SpC']
+        self.inp = inp
+
+    def __getitem__(self, key):
+        if isinstance(key, slice):
+            if key.step is None:
+                step = 1
+            else:
+                step = key.step
+            self.inp['s_start'] = key.start+1
+            self.inp['Ns'] = key.stop - key.start
+            [tmp, hdr] = sioread(**self.inp)
+            return tmp
+        self.inp['s_start'] = key+1
+        self.inp['Ns'] = 1
+        [tmp, hdr] = sioread(**self.inp)
+        return tmp
+
+    def get_chunk(self, i, size):
+        self.inp['s_start']  = i+1 
+        self.inp['Ns'] = size
+        [tmp, hdr] = sioread(**self.inp)
+        return tmp
