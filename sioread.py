@@ -180,7 +180,7 @@ def sioread(**kwargs):
             if	m > Ns:
                 X = X[:int(Ns), :]
             if	m < Ns:
-                raise ValueError('Requested # of samples not returned. Check that s_start is multiple of rec_num')
+                raise ValueError('Requested # of samples not returned. Check that s_start is multiple of rec_num: ' + str(SpR))
             
             
         # Incremental loading
@@ -202,6 +202,7 @@ class SioStream:
         # use header to get Nc and samples per channel
         self.Nc = hdr['Nc'] 
         self.SpC = hdr['SpC']
+        self.SpR = hdr['SpR']
         self.inp = inp
 
     def __getitem__(self, key):
@@ -210,17 +211,27 @@ class SioStream:
                 step = 1
             else:
                 step = key.step
-            self.inp['s_start'] = key.start+1
+            start = key.start
+            resid = start % self.SpR
+            if resid != 0:
+                start -= resid
+                self.inp['s_start'] = start+1
+                if key.stop is None:
+                    self.inp['Ns'] = 1
+                else:
+                    self.inp['Ns'] = key.stop - key.start + resid
+                print('----------------------------')
+                print(key.start)
+                print(self.inp['Ns'])
+                print(self.inp['s_start'])
+                [tmp, hdr] = sioread(**self.inp)
+                tmp = tmp[resid:] # truncate the unnecessary read at beg.
+                return tmp
+        self.inp['s_start'] = key.start+1
+        if key.stop is None:
+            self.inp['Ns'] = 1
+        else:
             self.inp['Ns'] = key.stop - key.start
-            [tmp, hdr] = sioread(**self.inp)
-            return tmp
-        self.inp['s_start'] = key+1
-        self.inp['Ns'] = 1
         [tmp, hdr] = sioread(**self.inp)
         return tmp
 
-    def get_chunk(self, i, size):
-        self.inp['s_start']  = i+1 
-        self.inp['Ns'] = size
-        [tmp, hdr] = sioread(**self.inp)
-        return tmp
