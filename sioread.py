@@ -207,6 +207,7 @@ class SioStream:
 
     def __getitem__(self, key):
         if isinstance(key, slice):
+            print(key.step)
             if key.step is None:
                 step = 1
             else:
@@ -220,10 +221,6 @@ class SioStream:
                     self.inp['Ns'] = 1
                 else:
                     self.inp['Ns'] = key.stop - key.start + resid
-                print('----------------------------')
-                print(key.start)
-                print(self.inp['Ns'])
-                print(self.inp['s_start'])
                 [tmp, hdr] = sioread(**self.inp)
                 tmp = tmp[resid:] # truncate the unnecessary read at beg.
                 return tmp
