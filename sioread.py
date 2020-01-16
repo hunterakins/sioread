@@ -21,7 +21,7 @@ def sioread(**kwargs):
     								True  - Disk efficient, memory intensive
     									All blocks read at once, requested
     									channels are selected afterwards
-    
+
      Output parameters:
     	X			array(Ns,Nc)	Data output matrix
     	Header	    dictionary		Descriptors found in file header
@@ -43,12 +43,12 @@ def sioread(**kwargs):
             Ns = -1
         else:
             Ns = kwargs['Ns']
-            
+
         if 'channels' not in kwargs.keys():
             channels = []
         else:
             channels = kwargs['channels']
-            
+
         if 'inMem' not in kwargs.keys():
             inMem = True
         else:
@@ -98,18 +98,18 @@ def sioread(**kwargs):
         Header['comment'] = comment
         Header['bs']  = bs
         Header['Description'] = """
-                    ID= ID Number 
-                    Nr  = # of Records in File 
-                    BpR = # of Bytes per Record 
+                    ID= ID Number
+                    Nr  = # of Records in File
+                    BpR = # of Bytes per Record
                     Nc  = # of channels in File
                     BpS = # of Bytes per Sample
                     tfReal = 0 - integer, 1 - real
                     SpC = # of Samples per Channel
-                    fname = File name 
-                    comment= Comment String 
+                    fname = File name
+                    comment= Comment String
                     bs  = Endian check value, should be 32677
                     """
-            
+
 
         # if either channel or # of samples is 0, then return just header
         if  (Ns == 0):
@@ -161,7 +161,7 @@ def sioread(**kwargs):
 
             #	Reshape data into a matrix of records
             Data	=	np.reshape(Data, (r_total, SpR)).T
-            
+
             #	Select each requested channel and stack associated records
             m	=	int(r_total/Nc *SpR)
             n	=	len(channels)
@@ -181,8 +181,8 @@ def sioread(**kwargs):
                 X = X[:int(Ns), :]
             if	m < Ns:
                 raise ValueError('Requested # of samples not returned. Check that s_start is multiple of rec_num: ' + str(SpR))
-            
-            
+
+
         # Incremental loading
         else:
             print('Not yet implemented incremental loading')
@@ -192,7 +192,7 @@ def sioread(**kwargs):
 
 class SioStream:
     """
-    data object implementing indexing and return sequential data 
+    data object implementing indexing and return sequential data
     Indexing starts out 0, but sioread indexes at 1, so I need to add 1 to all keys
     """
     def __init__(self, fname):
@@ -200,14 +200,13 @@ class SioStream:
         inp = {'fname': fname, 's_start': s_start, 'Ns':Ns}
         [tmp, hdr] = sioread(**inp)
         # use header to get Nc and samples per channel
-        self.Nc = hdr['Nc'] 
+        self.Nc = hdr['Nc']
         self.SpC = hdr['SpC']
         self.SpR = hdr['SpR']
         self.inp = inp
 
     def __getitem__(self, key):
         if isinstance(key, slice):
-            print(key.step)
             if key.step is None:
                 step = 1
             else:
@@ -231,4 +230,3 @@ class SioStream:
             self.inp['Ns'] = key.stop - key.start
         [tmp, hdr] = sioread(**self.inp)
         return tmp
-
