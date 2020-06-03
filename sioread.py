@@ -60,6 +60,7 @@ def sioread(**kwargs):
         bs	= unpack(endian +  'I', f.read(4))[0]		# should be 32677
         if bs != 32677:
             endian	=	'<'
+            f.seek(28)
             bs	=unpack(endian + 'I', f.read(4))[0]	# should be 32677
             if bs != 32677:
                 raise ValueError('Problem with byte swap constant:' + str(bs))
