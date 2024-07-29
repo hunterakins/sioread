@@ -72,7 +72,7 @@ def sioread(**kwargs):
         Nc	= int(unpack(endian + 'I', f.read(4))[0])	# # of channels in File
         BpS	= int(unpack(endian + 'I', f.read(4))[0])	# # of Bytes per Sample
         if BpS == 2:
-            dype = 'h'
+            dtype = 'h'
         else:
             dtype = 'f'
         tfReal = unpack(endian + 'I', f.read(4))[0] # 0 = integer, 1 = real
